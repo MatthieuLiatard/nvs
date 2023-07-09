@@ -1377,7 +1377,7 @@ function get_fond_carte_perso($mysqli,$carte, $id_perso){
  * Fonction qui affiche une pastille si le perso porte l'étendard
  */
 function affichage_pastille_etendard($pastille){
-	echo "<img tabindex='0'style=\"position: absolute;bottom: -2px;text-align: center; width: 100%;\" 
+	echo "<img tabindex='0'style=\"position: absolute;bottom: 25px;text-align: center; width: 100%;\" 
 		src='../images_perso/".$pastille."' width='40' height='40' title='etendard'alt='Porte-Etendard' />";
 }
 

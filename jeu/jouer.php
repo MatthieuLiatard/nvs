@@ -3768,7 +3768,7 @@ if($dispo == '1' || $admin){
 
 								// Affichage pastille étendard
 								$id_etendard = id_etendard_joueur($mysqli, $id_perso);
-								$id_etendard == 8 ? $pastille = 'rond_b.png' : $pastille = 'rond_r.png';								
+								$id_etendard == 8 ? $pastille = 'flag.png' : $pastille = 'flag.png';								
 								if($id_etendard > 0){
 									affichage_pastille_etendard($pastille);
 								};
@@ -4033,8 +4033,15 @@ if($dispo == '1' || $admin){
 													echo "			data-content=\"<div><a href='nouveau_message.php?pseudo=".$nom_ennemi."' target='_blank'>Envoyer un message</a></div>";
 													
 													afficher_lien_bouculade($x, $x_perso, $y, $y_perso, $cout_pm);
+													echo "			\" >";
 													
-													echo "			\" >" . $id_ennemi . "</div>";
+													// Affichage pastille étendard
+													$id_etendard = id_etendard_joueur($mysqli, $id_ennemi);
+													$id_etendard == 8 ? $pastille = 'flag.png' : $pastille = 'flag.png';
+													if($id_etendard > 0){
+														affichage_pastille_etendard($pastille);
+													}
+													echo $id_ennemi . "</div>";
 													
 													//--- Image perso
 													echo "		<img tabindex='0' border=0 src=\"../images_perso/$dossier_img_joueur/".$tab["image_carte"]."\" width=40 height=40 data-toggle='popover' data-trigger='focus' data-html='true' data-placement='bottom' ";
@@ -4086,7 +4093,7 @@ if($dispo == '1' || $admin){
 													echo "		>";
 													// Affichage pastille étendard
 													$id_etendard = id_etendard_joueur($mysqli, $id_ennemi);
-													$id_etendard == 8 ? $pastille = 'rond_b.png' : $pastille = 'rond_r.png';
+													$id_etendard == 8 ? $pastille = 'flag.png' : $pastille = 'flag.png';
 													if($id_etendard > 0){
 														affichage_pastille_etendard($pastille);
 													}
