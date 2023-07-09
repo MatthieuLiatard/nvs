@@ -2,7 +2,6 @@
 /**
  * Fonction permettant de savoir si un joueur porte l'étendard
  */
-Define("LISTE_ETENDARDS", "(8, 9, 12, 13)");
  
 function id_etendard_joueur($mysqli, $id_perso) {
 	

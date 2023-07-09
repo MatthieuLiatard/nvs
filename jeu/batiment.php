@@ -1205,7 +1205,7 @@ if($dispo == '1' || $admin){
 										$res = $mysqli->query($sql);
 										$nb = $res->num_rows;
 									} else {
-										$sql = "SELECT * from objet where (type_objet='N' OR type_objet='E') AND echangeable=1 AND id_objet!='8' AND id_objet!='9'";
+										$sql = "SELECT * from objet where (type_objet='N' OR type_objet='E') AND echangeable=1 AND id_objet NOT IN " .LISTE_ETENDARDS. ";";
 										$res = $mysqli->query($sql);
 										$nb = $res->num_rows;
 									}									

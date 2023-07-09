@@ -16,6 +16,9 @@ define ("MAX_NB_JOUEUR_DIFF", 3);
 /*
 	Parametres afferants aux regles du jeu
 */
+// remplacer avec categorie etendard en base de donnee
+Define("LISTE_ETENDARDS", "(8, 9, 12, 13)");
+
 // CONTRAINTES DE CONSTRUCTION
 // pourraient etre mises en base de donnee...
 // NB genie et docteurs
