@@ -2,6 +2,7 @@
 @session_start();  
 require_once("fonctions.php");
 require_once("jeu/f_carte.php");
+require_once("jeu/f_etendard.php"); // pour inporter les fonction etendard, qui devraient etre isolees pour optimiser
 	
 $mysqli = db_connexion();
 
@@ -324,11 +325,18 @@ function nouveau_tour_joueur($mysqli, $id_joueur, $new_dla, $clan, $couleur_clan
 		$convalescence_nouveau_tour	= $t_persos["convalescence"];
 		$est_renvoye			= $t_persos["est_renvoye"];
 		
+		/*
+		Ajout 8/7/2023 => bonus de l'etendard
+		Si un etendard est en visue lors de la generation du tour, le perso beneficie un certain nombre de bonus temporaires
+		*/
+		$idEtendard = GetEtendardEnVisue($mysqli, $id_perso_nouveau_tour);
+		$EtendardEnVisue = new Drapeau((int)$idEtendard);
+		$BonusTemporairesEtendard = $EtendardEnVisue->getBonus();
+		
 		// Calcul bonus perso
-		$new_bonus_perso = 0;
-		if ($bonus_perso_nouveau_tour + 5 <= 0) {
-			$new_bonus_perso = $bonus_perso_nouveau_tour + 5;
-		}
+		// Nouveau tour: le bonus d'esquive augmente de +5 s'il est negatif
+		// Si un etendard est en visue, le bonus peut augmenter au dela de 0
+		$new_bonus_perso = min($bonus_perso_nouveau_tour + 5, $BonusTemporairesEtendard['bonus_perso']);
 		
 		// Calcul gains Or / PC
 		if ($chef_perso_nouveau_tour == '1') {
@@ -522,7 +530,7 @@ function nouveau_tour_joueur($mysqli, $id_joueur, $new_dla, $clan, $couleur_clan
 			$bonus_recup_terrain = get_malus_recup($fond);
 			
 			// Calcul pv nouveau tour 
-			$pv_nouveau = $pv_perso_nouveau_tour + $recup_perso_nouveau_tour + $bonus_recup_bat + $bonus_recup_terrain;
+			$pv_nouveau = $pv_perso_nouveau_tour + $recup_perso_nouveau_tour + $bonus_recup_bat + $bonus_recup_terrain + $BonusTemporairesEtendard['bonusRecup_perso'];
 			if ($pv_nouveau > $pv_max_perso_nouveau_tour) {
 				$pv_nouveau = $pv_max_perso_nouveau_tour;
 			} else if ($pv_nouveau <= 0) {
