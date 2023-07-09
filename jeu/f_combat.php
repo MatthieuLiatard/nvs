@@ -1,6 +1,7 @@
 <?php
 
 require_once("config.php");
+require_once("f_etendard.php");
 
 /**
   * Fonction de combat d'un pnj
@@ -654,7 +655,8 @@ function check_cible_capturee($mysqli, $carte, $id, $clan_perso, $couleur_clan_p
 
 		// Chef
 		if ($tp_perso == 1) {
-			perte_etendard($mysqli, $id_cible, $x_cible, $y_cible);
+			// la perte de l'etendard est geree comme la perte de n'importe quel objet
+			//perte_etendard($mysqli, $id_cible, $x_cible, $y_cible);
 			// Quand un chef meurt, il perd 5% de ses XPi et de ses PC
 			// Calcul PI
 			$pi_perdu 		= floor(($pi_cible * 5) / 100);
@@ -745,58 +747,7 @@ function check_cible_capturee($mysqli, $carte, $id, $clan_perso, $couleur_clan_p
 				}
 			}
 			
-			/*
-			Ajout 6/7/2023 - Matt
-			Possibilite de perdre objet transporte dans le sac, avec probabilite determinee dans la base
-			*/
-			
-			$sql = "SELECT * FROM objet 
-					INNER JOIN perso_as_objet ON perso_as_objet.id_objet = objet.id_objet AND perso_as_objet.id_perso = '$id_cible' 
-					WHERE objet.Perte_Proba > 0; ";
-			$res = $mysqli->query($sql);
-			
-			foreach($res as $row){
-				// pour chaque objet qui peut etre perdu avec une proba non nulle
-				if(mt_rand(0,100) < $row["Perte_Proba"]){
-					// Si l'objet est perdu
-					// 1) Retirer l'objet de l'inventaire
-					// Suppression de l'arme de l'inventaire du perso
-					$sql = "DELETE FROM perso_as_objet WHERE id_perso='$id_cible' AND id_objet=". $row["id_objet"] . " LIMIT 1";
-					$mysqli->query($sql);
-
-				
-					// 2) Modifier le poids de l'inventaire
-					// Maj charge perso suite perte de l'arme
-					$sql = "UPDATE perso SET charge_perso = charge_perso - ". $row["poids_objet"] . " WHERE id_perso='$id_cible'";
-					$mysqli->query($sql);
-					
-					// 3) AJouter l'objet a terre
-					// On dépose la perte de l'arme par terre
-					// Verification si l'objet existe deja sur cette case
-					$sql = "SELECT nb_objet FROM objet_in_carte 
-						WHERE objet_in_carte.x_carte = $x_cible 
-						AND objet_in_carte.y_carte = $y_cible 
-						AND id_objet = ". $row["id_objet"];
-					$res2 = $mysqli->query($sql);
-					$to2 = $res2->fetch_assoc();
-						
-					if($to2){
-						// On met a jour le nombre
-						$sql = "UPDATE objet_in_carte SET nb_objet = nb_objet + 1 
-							WHERE id_objet=". $row["id_objet"] . "
-							AND x_carte='$x_cible' AND y_carte='$y_cible'";
-						$mysqli->query($sql);
-					}
-					else {
-						// Insertion dans la table objet_in_carte : On cree le premier enregistrement
-						$sql = "INSERT INTO objet_in_carte (type_objet, id_objet, nb_objet, x_carte, y_carte) VALUES ('2',". $row["id_objet"] . ",1,'$x_cible','$y_cible')";
-						$mysqli->query($sql);
-					}
-					
-					
-					
-				}
-			}
+			perteAleatoireObjets($mysqli, $id_cible, $x_cible, $y_cible);
 			
 		}
 
@@ -955,7 +906,8 @@ function check_degats_zone($mysqli, $carte, $id, $nom_perso, $grade_perso, $type
 
 				// Chef
 				if ($tp_collat_fin == 1) {
-					perte_etendard($mysqli, $id_cible_collat, $x_collat_fin , $y_collat_fin);
+					// la perte de l'etendard est geree comme la perte de n'importe quel objet
+					//perte_etendard($mysqli, $id_cible_collat, $x_collat_fin , $y_collat_fin);
 					// Quand un chef meurt, il perd 5% de ses XPi et de ses PC
 					// Calcul PI
 					$pi_perdu 		= floor(($pi_collat_fin * 5) / 100);
@@ -1041,6 +993,8 @@ function check_degats_zone($mysqli, $carte, $id, $nom_perso, $grade_perso, $type
 						}
 					}
 				}
+				
+				perteAleatoireObjets($mysqli, $id_cible, $x_cible, $y_cible);
 
 				echo "<div class=\"infoi\">Vous avez capturé <font color='$couleur_clan_collat'>$nom_collat</font> - Matricule $id_cible_collat ! <font color=red>Félicitations.</font></div>";
 
@@ -1295,38 +1249,60 @@ function distance_min_charge_pm($type_perso) {
 	return 3;
 }
 
-/**
- * Fonction permettant de savoir si un joueur porte l'étendard
- */
-function id_etendard_joueur($mysqli, $id_perso) {
+function perteAleatoireObjets($mysqli, $id_cible, $x_cible, $y_cible){
+	/*
+	Ajout 6/7/2023 - Matt
+	Possibilite de perdre objet transporte dans le sac, avec probabilite determinee dans la base
+	*/
 	
-	$sql = "SELECT perso_as_objet.id_objet FROM perso_as_objet WHERE id_perso='$id_perso' AND (id_objet='8' OR id_objet='9')";
+	$sql = "SELECT * FROM objet 
+			INNER JOIN perso_as_objet ON perso_as_objet.id_objet = objet.id_objet AND perso_as_objet.id_perso = '$id_cible' 
+			WHERE objet.Perte_Proba > 0; ";
 	$res = $mysqli->query($sql);
-	$num = $res->num_rows;
 	
-	if($num){
-		$t = $res->fetch_assoc();
-		return $t["id_objet"];
+	foreach($res as $row){
+		// pour chaque objet qui peut etre perdu avec une proba non nulle
+		if(mt_rand(0,100) < $row["Perte_Proba"]){
+			// Si l'objet est perdu
+			// 1) Retirer l'objet de l'inventaire
+			// Suppression de l'arme de l'inventaire du perso
+			$sql = "DELETE FROM perso_as_objet WHERE id_perso='$id_cible' AND id_objet=". $row["id_objet"] . " LIMIT 1";
+			$mysqli->query($sql);
+
+		
+			// 2) Modifier le poids de l'inventaire
+			// Maj charge perso suite perte de l'arme
+			$sql = "UPDATE perso SET charge_perso = charge_perso - ". $row["poids_objet"] . " WHERE id_perso='$id_cible'";
+			$mysqli->query($sql);
+			
+			// 3) AJouter l'objet a terre
+			// On dépose la perte de l'arme par terre
+			// Verification si l'objet existe deja sur cette case
+			$sql = "SELECT nb_objet FROM objet_in_carte 
+				WHERE objet_in_carte.x_carte = $x_cible 
+				AND objet_in_carte.y_carte = $y_cible 
+				AND id_objet = ". $row["id_objet"];
+			$res2 = $mysqli->query($sql);
+			$to2 = $res2->fetch_assoc();
+				
+			if($to2){
+				// On met a jour le nombre
+				$sql = "UPDATE objet_in_carte SET nb_objet = nb_objet + 1 
+					WHERE id_objet=". $row["id_objet"] . "
+					AND x_carte='$x_cible' AND y_carte='$y_cible'";
+				$mysqli->query($sql);
+			}
+			else {
+				// Insertion dans la table objet_in_carte : On cree le premier enregistrement
+				$sql = "INSERT INTO objet_in_carte (type_objet, id_objet, nb_objet, x_carte, y_carte) VALUES ('2',". $row["id_objet"] . ",1,'$x_cible','$y_cible')";
+				$mysqli->query($sql);
+			}
+			
+			
+			
+		}
 	}
-	
-	return 0;
 }
 
-function perte_etendard($mysqli, $idPerso_carte, $x_cible, $y_cible){
-	$id_etendard = id_etendard_joueur($mysqli, $idPerso_carte);
-	if($id_etendard > 0){
-		// Suppression de l'étendard de l'inventaire du perso
-		$sql = "DELETE FROM perso_as_objet WHERE id_perso='$idPerso_carte' AND id_objet='$id_etendard' LIMIT 1";
-		$mysqli->query($sql);
-
-		// Maj charge perso suite perte de l'arme
-		$sql = "UPDATE perso SET charge_perso = charge_perso - (SELECT poids_objet FROM objet WHERE id_objet='$id_etendard') WHERE id_perso='$idPerso_carte'";
-		$mysqli->query($sql);
-
-		// On dépose la perte de l'étendard par terre
-		$sql = "INSERT INTO objet_in_carte (type_objet, id_objet, nb_objet, x_carte, y_carte) VALUES ('2','$id_etendard','1','$x_cible','$y_cible')";
-		$mysqli->query($sql);
-	}
-}
 
 ?>

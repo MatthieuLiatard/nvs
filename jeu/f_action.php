@@ -197,27 +197,27 @@ function verif_contraintes_construction($mysqli, $id_bat, $camp_perso, $x_bat, $
 	// Conditions construction
 	if ($id_bat == '9') {
 		// Fort => 16 Génie civil présent à 10 cases autour du point de construction
-		$nb_genie_civil 	= 16;
+		$nb_genie_civil 	= CONTRAINTES_CONSTRUCTION_FORT_NB_GENIE;
 		$nb_soigneur		= 0;
 	}
 	else if ($id_bat == '8') {
 		// Fortin => 10 Génie civil présent à 10 cases autour du point de construction
-		$nb_genie_civil 	= 10;
+		$nb_genie_civil 	= CONTRAINTES_CONSTRUCTION_FORTIN_NB_GENIE;
 		$nb_soigneur		= 0;
 	}
 	else if ($id_bat == '11') {
 		// Gare => 6 Génie civil présent à 10 cases autour du point de construction
-		$nb_genie_civil 	= 6;
+		$nb_genie_civil 	= CONTRAINTES_CONSTRUCTION_GARE_NB_GENIE;
 		$nb_soigneur		= 0;
 	}
 	else if ($id_bat == '7') {
 		// Hopital => 3 Génie civil présent à 10 cases autour du point de construction
-		$nb_genie_civil 	= 3;
+		$nb_genie_civil 	= CONTRAINTES_CONSTRUCTION_HOSTO_NB_GENIE;
 		$nb_soigneur		= 1;
 	}
 	else if ($id_bat == '2') {
 		// tour de guêt => 1 Génie civil
-		$nb_genie_civil 	= 1;
+		$nb_genie_civil 	= CONTRAINTES_CONSTRUCTION_TDG_NB_GENIE;
 		$nb_soigneur		= 0;
 	}
 	else {
@@ -312,45 +312,45 @@ function verif_contraintes_construction_bat($mysqli, $id_bat, $camp_perso, $x_ba
 	// Conditions construction
 	if ($id_bat == '2') {
 		// Tour de guet
-		$nb_cases_bat 	= 2;
-		$nb_cases_gare	= 2;
-		$nb_cases_rapat = 2;
-		$nb_cases_tour	= 7;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_TDG_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_TDG_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_TDG_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_TDG_DISTANCE["TDG"];
 	}
 	else if ($id_bat == '5' || $id_bat == '1') {
 		// Barricades et Ponts
-		$nb_cases_bat 	= 0;
-		$nb_cases_gare	= 2;
-		$nb_cases_rapat = 2;
-		$nb_cases_tour	= 0;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_BARRICADE_PONT_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_BARRICADE_PONT_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_BARRICADE_PONT_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_BARRICADE_PONT_DISTANCE["TDG"];
 	}
 	else if ($id_bat == '7') {
 		// Hopital
-		$nb_cases_bat 	= 2;
-		$nb_cases_gare	= 20;
-		$nb_cases_rapat = 20;
-		$nb_cases_tour	= 0;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_HOSTO_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_HOSTO_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_HOSTO_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_HOSTO_DISTANCE["TDG"];
 	}
 	else if ($id_bat == '8') {
 		// Fortin
-		$nb_cases_bat 	= 2;
-		$nb_cases_gare	= 20;
-		$nb_cases_rapat = 40;
-		$nb_cases_tour	= 0;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_FORTIN_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_FORTIN_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_FORTIN_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_FORTIN_DISTANCE["TDG"];
 	}
 	else if ($id_bat == '9') {
 		// Fort
-		$nb_cases_bat 	= 2;
-		$nb_cases_gare	= 20;
-		$nb_cases_rapat = 40;
-		$nb_cases_tour	= 0;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_FORT_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_FORT_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_FORT_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_FORT_DISTANCE["TDG"];
 	}
 	else if ($id_bat == '11') {
 		// Gare
-		$nb_cases_bat 	= 2;
-		$nb_cases_gare	= 40;
-		$nb_cases_rapat = 20;
-		$nb_cases_tour	= 0;
+		$nb_cases_bat 	= CONTRAINTES_CONSTRUCTION_GARE_DISTANCE["Bat"];
+		$nb_cases_gare	= CONTRAINTES_CONSTRUCTION_GARE_DISTANCE["Gare"];
+		$nb_cases_rapat = CONTRAINTES_CONSTRUCTION_GARE_DISTANCE["Rapat"];
+		$nb_cases_tour	= CONTRAINTES_CONSTRUCTION_GARE_DISTANCE["TDG"];
 	}
 	else {
 		$nb_cases_bat 	= 2;
@@ -3449,9 +3449,10 @@ function action_deposerObjet($mysqli, $id_perso, $type_objet, $id_objet, $quanti
 			$res = $mysqli->query($sql);
 			$to = $res->fetch_assoc();
 			
-			$nb_o = $to["nb_objet"];
 			
-			if($nb_o){
+			
+			if($to){
+				$nb_o = $to["nb_objet"];
 				// On met a jour le nombre
 				$sql = "UPDATE objet_in_carte SET nb_objet = nb_objet + $quantite
 						WHERE type_objet='$type_objet' AND id_objet='$id_objet'
@@ -3493,9 +3494,12 @@ function est_marchand($mysqli, $id_perso){
 	$sql = "SELECT nb_points FROM perso_as_competence WHERE id_perso='$id_perso' AND id_competence='50'";
 	$res = $mysqli->query($sql);
 	$t = $res->fetch_assoc();
-		
-	return $t['nb_points'];
 	
+	if($t){
+		return $t['nb_points'];
+	}else{
+		return 0;
+	}
 	
 }
 
@@ -4169,6 +4173,8 @@ function charge_bonne($mysqli, $id_perso, $nom_perso, $image_perso, $clan, $coul
 							}
 						}
 						
+						perteAleatoireObjets($mysqli, $idPerso_carte, $x_cible, $y_cible);
+						
 						// evenement perso capture
 						$sql = "INSERT INTO `evenement` (IDActeur_evenement, nomActeur_evenement, phrase_evenement, IDCible_evenement, nomCible_evenement, effet_evenement, date_evenement, special) VALUES ($id_perso,'<font color=$couleur_clan_perso><b>$nom_perso</b></font>','<b>a capturé</b>','$idPerso_carte','<font color=$couleur_clan_cible><b>$nom_cible</b></font> ($nom_grade_cible)','',NOW(),'0')";
 						$mysqli->query($sql);
@@ -4189,7 +4195,8 @@ function charge_bonne($mysqli, $id_perso, $nom_perso, $image_perso, $clan, $coul
 						
 						// Chef
 						if ($type_perso_cible == 1) {
-							perte_etendard($mysqli, $idPerso_carte,$x_cible, $y_cible);
+							// la perte de l'etendard est geree comme la perte de n'importe quel objet
+							//perte_etendard($mysqli, $idPerso_carte,$x_cible, $y_cible);
 							// Quand un chef meurt, il perd 5% de ses XP,XPi et de ses PC
 							// Calcul PI
 							$pi_perdu 		= floor(($pi_perso_cible * 5) / 100);
