@@ -58,6 +58,7 @@ if (isset($_GET['clef']) && $_GET['clef'] == $clef_secrete) {
 		$t_g = $res_g->fetch_assoc();
 		$nb_g = $res_g->num_rows;
 		
+
 		
 		if ($nb_g) {
 		
@@ -111,6 +112,7 @@ if (isset($_GET['clef']) && $_GET['clef'] == $clef_secrete) {
 				$res_r = $mysqli->query($sql_r);
 				$nb_r = $res_r->num_rows;
 				
+
 				
 				if ($nb_r) {
 					// rail trouvé
